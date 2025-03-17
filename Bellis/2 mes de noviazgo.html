@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rompecabezas de Pareja</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #ffe6f2;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 2px;
+            margin: 20px auto;
+            width: 404px;
+        }
+        .piece {
+            width: 100px;
+            height: 100px;
+            background-size: 400px 400px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        #mensaje {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Rompecabezas de Pareja 💖</h2>
+        <div class="puzzle-container" id="puzzle"></div>
+        <p id="mensaje"></p>
+    </div>
+    
+    <script>
+        const imagen = "bellis.jpg"; // Reemplázala con la URL de tu imagen
+        let piezas = [];
+        let posiciones = [];
+        
+        function crearRompecabezas() {
+            const puzzle = document.getElementById("puzzle");
+            puzzle.innerHTML = "";
+            piezas = [];
+            posiciones = [];
+            
+            for (let i = 0; i < 16; i++) {
+                let pieza = document.createElement("div");
+                pieza.classList.add("piece");
+                let x = (i % 4) * -100;
+                let y = Math.floor(i / 4) * -100;
+                pieza.style.backgroundImage = `url(${imagen})`;
+                pieza.style.backgroundPosition = `${x}px ${y}px`;
+                pieza.dataset.index = i;
+                pieza.draggable = true;
+                pieza.addEventListener("dragstart", dragStart);
+                pieza.addEventListener("dragover", dragOver);
+                pieza.addEventListener("drop", drop);
+                
+                piezas.push(pieza);
+                posiciones.push(i);
+            }
+            
+            posiciones = posiciones.sort(() => Math.random() - 0.5);
+            posiciones.forEach(i => puzzle.appendChild(piezas[i]));
+        }
+        
+        function dragStart(event) {
+            event.dataTransfer.setData("text", event.target.dataset.index);
+        }
+        
+        function dragOver(event) {
+            event.preventDefault();
+        }
+        
+        function drop(event) {
+            event.preventDefault();
+            let draggedIndex = event.dataTransfer.getData("text");
+            let targetIndex = event.target.dataset.index;
+            
+            let draggedElement = piezas[draggedIndex];
+            let targetElement = piezas[targetIndex];
+            
+            let parent = draggedElement.parentNode;
+            let temp = document.createElement("div");
+            parent.replaceChild(temp, draggedElement);
+            parent.replaceChild(draggedElement, targetElement);
+            parent.replaceChild(targetElement, temp);
+            
+            verificarOrden();
+        }
+        
+        function verificarOrden() {
+            let puzzle = document.getElementById("puzzle").children;
+            let correcto = true;
+            for (let i = 0; i < puzzle.length; i++) {
+                if (puzzle[i].dataset.index != i) {
+                    correcto = false;
+                    break;
+                }
+            }
+            if (correcto) {
+                document.getElementById("mensaje").innerText = "¡Felicidades! Has completado el rompecabezas. 💕";
+            }
+        }
+        
+        crearRompecabezas();
+    </script>
+</body>
+</html>
