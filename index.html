@@ -11,7 +11,6 @@
             background: url('lirios.jpg') no-repeat center center fixed;
             background-size: cover;
             color: #fff;
-            overflow: hidden;
         }
         .container {
             max-width: 500px;
@@ -55,27 +54,6 @@
             from { color: #d63384; }
             to { color: #ff69b4; }
         }
-
-        /* Estilos para los corazones */
-        .corazon {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: url('corazon.png') no-repeat center center;
-            background-size: cover;
-            animation: animarCorazon 3s forwards;
-        }
-
-        @keyframes animarCorazon {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-100px) scale(1.5);
-            }
-        }
     </style>
 </head>
 <body>
@@ -112,13 +90,14 @@
                 pieza.classList.add("piece");
                 let x = (i % 4) * -100;
                 let y = Math.floor(i / 4) * -100;
-                pieza.style.backgroundImage = `url(${imagen})`;  // Corregido con comillas invertidas
-                pieza.style.backgroundPosition = `${x}px ${y}px`;  // Corregido con comillas invertidas
+                pieza.style.backgroundImage = `url(${imagen})`;
+                pieza.style.backgroundPosition = `${x}px ${y}px`;
                 pieza.dataset.index = i;
-                pieza.draggable = true;
+                pieza.setAttribute("draggable", true);
                 pieza.addEventListener("dragstart", dragStart);
                 pieza.addEventListener("dragover", dragOver);
                 pieza.addEventListener("drop", drop);
+                pieza.addEventListener("dragend", dragEnd);
                 
                 piezas.push(pieza);
                 posiciones.push(i);
@@ -128,31 +107,40 @@
             posiciones.forEach(i => puzzle.appendChild(piezas[i]));
         }
         
+        let draggedPiece = null;
+
         function dragStart(event) {
-            event.dataTransfer.setData("text", event.target.dataset.index);
+            draggedPiece = event.target; // Guardamos la pieza que se está arrastrando
+            event.dataTransfer.setData("text", draggedPiece.dataset.index); // Guardamos el índice de la pieza
         }
         
         function dragOver(event) {
-            event.preventDefault();
+            event.preventDefault(); // Necesario para permitir que el "drop" ocurra
         }
         
         function drop(event) {
             event.preventDefault();
-            let draggedIndex = event.dataTransfer.getData("text");
+            if (draggedPiece === event.target) return; // Si la pieza arrastrada es la misma que la soltada, no hacer nada
+
+            // Intercambiamos las posiciones de las piezas arrastrada y objetivo
+            let draggedIndex = draggedPiece.dataset.index;
             let targetIndex = event.target.dataset.index;
             
-            if (draggedIndex === targetIndex) return; 
-            
-            let draggedElement = piezas[draggedIndex];
-            let targetElement = piezas[targetIndex];
-            
-            let parent = draggedElement.parentNode;
+            // Realizamos el intercambio en el DOM
             let temp = document.createElement("div");
-            parent.replaceChild(temp, draggedElement);
-            parent.replaceChild(draggedElement, targetElement);
-            parent.replaceChild(targetElement, temp);
-            
+            let parent = draggedPiece.parentNode;
+            parent.replaceChild(temp, draggedPiece);
+            parent.replaceChild(draggedPiece, event.target);
+            parent.replaceChild(event.target, temp);
+
+            // Intercambiamos los índices en el array de piezas
+            [piezas[draggedIndex], piezas[targetIndex]] = [piezas[targetIndex], piezas[draggedIndex]];
+
             verificarOrden();
+        }
+
+        function dragEnd(event) {
+            draggedPiece = null; // Limpiamos la referencia a la pieza arrastrada
         }
         
         function verificarOrden() {
@@ -165,29 +153,11 @@
                 }
             }
             if (correcto) {
-                // Muestra el mensaje y anima los corazones
                 document.getElementById("mensaje").innerHTML = "¡Felicidades! Has completado el rompecabezas. 💕" +
                 "<br><span class='ganaste'>¡TE AMOOOOOOOO! 💖</span>";
-                animarCorazones();
             } else {
                 let mensajeAleatorio = mensajesRomanticos[Math.floor(Math.random() * mensajesRomanticos.length)];
                 document.getElementById("mensaje").innerText = mensajeAleatorio;
-            }
-        }
-
-        // Función para animar los corazones cuando el rompecabezas se complete
-        function animarCorazones() {
-            for (let i = 0; i < 10; i++) {
-                let corazon = document.createElement("div");
-                corazon.classList.add("corazon");
-                corazon.style.left = `${Math.random() * window.innerWidth}px`;
-                corazon.style.animationDelay = `${Math.random() * 2}s`;
-                document.body.appendChild(corazon);
-                
-                // Eliminar el corazón después de que termine la animación
-                corazon.addEventListener('animationend', () => {
-                    corazon.remove();
-                });
             }
         }
         
