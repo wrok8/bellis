@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rompecabezas de Pareja</title>
+    <title>2 Meses Pastelita</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #ffe6f2;
+            background: url('lirios.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            overflow: hidden;
         }
         .container {
             max-width: 500px;
             margin: 50px auto;
             padding: 20px;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #d63384;
         }
         .puzzle-container {
             display: grid;
@@ -32,24 +36,70 @@
             background-size: 400px 400px;
             cursor: pointer;
             border: 1px solid #ddd;
+            transition: transform 0.3s ease-in-out;
+        }
+        .piece:active {
+            transform: scale(1.1);
         }
         #mensaje {
             font-size: 18px;
             margin-top: 20px;
+            color: #d63384;
+        }
+        .ganaste {
+            font-size: 24px;
+            font-weight: bold;
+            animation: brillo 1s infinite alternate;
+        }
+        @keyframes brillo {
+            from { color: #d63384; }
+            to { color: #ff69b4; }
+        }
+
+        /* Estilos para los corazones */
+        .corazon {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: url('corazon.png') no-repeat center center;
+            background-size: cover;
+            animation: animarCorazon 3s forwards;
+        }
+
+        @keyframes animarCorazon {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Rompecabezas de Pareja 💖</h2>
+        <h2>2 Meses Pastelita 💖</h2>
         <div class="puzzle-container" id="puzzle"></div>
         <p id="mensaje"></p>
     </div>
     
     <script>
-        const imagen = "images/bellis.jpeg"; // Reemplázala con la URL de tu imagen
+        const imagen = "images/bellis.jpeg"; // Ruta a la imagen
         let piezas = [];
         let posiciones = [];
+        const mensajesRomanticos = [
+            "Eres la piecita que me faltaba mi cielito 💕",
+            "Te amo muchoteeeee 😍",
+            "Contigo encajo tan bonito 💖",
+            "Cada partecita de ti te hace perfecta 💘",
+            "Hay partes de mí que solo existen cuando estoy contigo ❤️",
+            "Tú eres mi pedacito de cielo ✨",
+            "Complementas mis días 🌸",
+            "Avanzar contigo día a día me hace el hombre más feliz 💑",
+            "Amo cada parte de tu ser 💓"
+        ];
         
         function crearRompecabezas() {
             const puzzle = document.getElementById("puzzle");
@@ -62,8 +112,8 @@
                 pieza.classList.add("piece");
                 let x = (i % 4) * -100;
                 let y = Math.floor(i / 4) * -100;
-                pieza.style.backgroundImage = `url(${imagen})`;
-                pieza.style.backgroundPosition = `${x}px ${y}px`;
+                pieza.style.backgroundImage = `url(${imagen})`;  // Corregido con comillas invertidas
+                pieza.style.backgroundPosition = `${x}px ${y}px`;  // Corregido con comillas invertidas
                 pieza.dataset.index = i;
                 pieza.draggable = true;
                 pieza.addEventListener("dragstart", dragStart);
@@ -74,7 +124,7 @@
                 posiciones.push(i);
             }
             
-            posiciones = posiciones.sort(() => Math.random() - 0.5);
+            posiciones.sort(() => Math.random() - 0.5);
             posiciones.forEach(i => puzzle.appendChild(piezas[i]));
         }
         
@@ -90,6 +140,8 @@
             event.preventDefault();
             let draggedIndex = event.dataTransfer.getData("text");
             let targetIndex = event.target.dataset.index;
+            
+            if (draggedIndex === targetIndex) return; 
             
             let draggedElement = piezas[draggedIndex];
             let targetElement = piezas[targetIndex];
@@ -113,7 +165,29 @@
                 }
             }
             if (correcto) {
-                document.getElementById("mensaje").innerText = "¡Felicidades! Has completado el rompecabezas. 💕";
+                // Muestra el mensaje y anima los corazones
+                document.getElementById("mensaje").innerHTML = "¡Felicidades! Has completado el rompecabezas. 💕" +
+                "<br><span class='ganaste'>¡TE AMOOOOOOOO! 💖</span>";
+                animarCorazones();
+            } else {
+                let mensajeAleatorio = mensajesRomanticos[Math.floor(Math.random() * mensajesRomanticos.length)];
+                document.getElementById("mensaje").innerText = mensajeAleatorio;
+            }
+        }
+
+        // Función para animar los corazones cuando el rompecabezas se complete
+        function animarCorazones() {
+            for (let i = 0; i < 10; i++) {
+                let corazon = document.createElement("div");
+                corazon.classList.add("corazon");
+                corazon.style.left = `${Math.random() * window.innerWidth}px`;
+                corazon.style.animationDelay = `${Math.random() * 2}s`;
+                document.body.appendChild(corazon);
+                
+                // Eliminar el corazón después de que termine la animación
+                corazon.addEventListener('animationend', () => {
+                    corazon.remove();
+                });
             }
         }
         
