@@ -8,8 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background: url('lirios.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background-color: #f8d7da; /* Fondo rosita pastel */
             color: #fff;
         }
         .container {
@@ -54,6 +53,42 @@
             from { color: #d63384; }
             to { color: #ff69b4; }
         }
+        #botonRomantico {
+            display: none; /* Inicialmente oculto */
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ff69b4;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #botonRomantico:hover {
+            background-color: #ff1493;
+        }
+        #carta {
+            display: none; /* Inicialmente oculta */
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            color: #d63384;
+            border-radius: 10px;
+            animation: aparecer 1s ease-in-out forwards;
+        }
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        #musica {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -61,6 +96,14 @@
         <h2>2 Meses Pastelita 💖</h2>
         <div class="puzzle-container" id="puzzle"></div>
         <p id="mensaje"></p>
+        <button id="botonRomantico" onclick="mostrarCarta()">Ver Cartita 💌</button>
+        <div id="carta">
+            <p>Mi amor, quiero agradecerte por cada momento que compartimos. Me haces sentir tan afortunado/a. Cada día contigo es un regalo. Te amo más de lo que las palabras pueden expresar. 💖</p>
+        </div>
+        <audio id="musica" controls>
+            <source src="ruta/a/tu/cancion.mp3" type="audio/mp3">
+            Tu navegador no soporta la etiqueta de audio.
+        </audio>
     </div>
     
     <script>
@@ -155,10 +198,17 @@
             if (correcto) {
                 document.getElementById("mensaje").innerHTML = "¡Felicidades! Has completado el rompecabezas. 💕" +
                 "<br><span class='ganaste'>¡TE AMOOOOOOOO! 💖</span>";
+                document.getElementById("botonRomantico").style.display = "block"; // Mostrar el botón romántico
             } else {
                 let mensajeAleatorio = mensajesRomanticos[Math.floor(Math.random() * mensajesRomanticos.length)];
                 document.getElementById("mensaje").innerText = mensajeAleatorio;
             }
+        }
+        
+        function mostrarCarta() {
+            document.getElementById("carta").style.display = "block"; // Mostrar la carta
+            document.getElementById("musica").style.display = "block"; // Mostrar la música
+            document.getElementById("musica").play(); // Reproducir la música
         }
         
         crearRompecabezas();
