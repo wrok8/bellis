@@ -8,8 +8,8 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f8d7da; /* Fondo rosita pastel */
-            color: #fff;
+            background-color: #f8d7da;
+            color: #d63384;
         }
         .container {
             max-width: 500px;
@@ -44,17 +44,8 @@
             margin-top: 20px;
             color: #d63384;
         }
-        .ganaste {
-            font-size: 24px;
-            font-weight: bold;
-            animation: brillo 1s infinite alternate;
-        }
-        @keyframes brillo {
-            from { color: #d63384; }
-            to { color: #ff69b4; }
-        }
         #botonRomantico {
-            display: none; /* Inicialmente oculto */
+            display: none;
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 18px;
@@ -62,28 +53,28 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            color: white;
         }
         #botonRomantico:hover {
             background-color: #ff1493;
         }
         #carta {
-            display: none; /* Inicialmente oculta */
+            display: none;
             margin-top: 20px;
             padding: 20px;
             background-color: #fff;
             color: #d63384;
             border-radius: 10px;
-            animation: aparecer 1s ease-in-out forwards;
+            text-align: center;
         }
-        @keyframes aparecer {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .linea {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        }
+        .mostrar {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
         }
         #musica {
             display: none;
@@ -95,15 +86,16 @@
     <div class="container">
         <h2>2 Meses Pastelita 💖</h2>
         <div class="puzzle-container" id="puzzle"></div>
-        <p id="mensaje"></p>
+        <p id="mensaje">Completa el rompecabezas para ver tu sorpresita. 💕</p>
         <button id="botonRomantico" onclick="mostrarCarta()">Ver Cartita 💌</button>
         <div id="carta">
-            <p>Mi amor, quiero agradecerte por cada momento que compartimos juntitos. 
-                Me haces sentir tan afortunado de tenerte. Cada día contigo es un regalo. 
-                Te amo más de lo que las palabras pueden expresar. pero te dedico esta cancioncita
-                espero te guste, me volvi bien fan de este muchacho y me veo en la necesidad de que 
-                sepas cuanto te pienso con cada detalle de la vida, estas en todas partes. 💖</p>
+            <p class="linea">Mi amor, quiero agradecerte por cada momento que compartimos juntitos. 💕</p>
+            <p class="linea">Me haces sentir tan afortunado de tenerte. Cada día contigo es un regalo. 🎁</p>
+            <p class="linea">Te amo más de lo que las palabras pueden expresar. Pero te dedico esta cancioncita, 🎵</p>
+            <p class="linea">espero te guste. Me volví bien fan de este muchacho y me veo en la necesidad de que</p>
+            <p class="linea">sepas cuánto te pienso con cada detalle de la vida. Estás en todas partes mi cielo. 🌥️</p>
         </div>
+        
         <audio id="musica" controls>
             <source src="Music/Atencion.mp3" type="audio/mp3">
             Tu navegador no soporta la etiqueta de audio.
@@ -111,7 +103,7 @@
     </div>
     
     <script>
-        const imagen = "images/bellis.jpeg"; // Ruta a la imagen
+        const imagen = "images/bellis.jpeg"; 
         let piezas = [];
         let posiciones = [];
         const mensajesRomanticos = [
@@ -125,7 +117,8 @@
             "Avanzar contigo día a día me hace el hombre más feliz 💑",
             "Amo cada parte de tu ser 💓"
         ];
-        
+        let mensajeIndex = 0;
+
         function crearRompecabezas() {
             const puzzle = document.getElementById("puzzle");
             puzzle.innerHTML = "";
@@ -157,39 +150,44 @@
         let draggedPiece = null;
 
         function dragStart(event) {
-            draggedPiece = event.target; // Guardamos la pieza que se está arrastrando
-            event.dataTransfer.setData("text", draggedPiece.dataset.index); // Guardamos el índice de la pieza
+            draggedPiece = event.target;
+            event.dataTransfer.setData("text", draggedPiece.dataset.index);
         }
         
         function dragOver(event) {
-            event.preventDefault(); // Necesario para permitir que el "drop" ocurra
+            event.preventDefault();
         }
         
         function drop(event) {
             event.preventDefault();
-            if (draggedPiece === event.target) return; // Si la pieza arrastrada es la misma que la soltada, no hacer nada
+            if (draggedPiece === event.target) return;
 
-            // Intercambiamos las posiciones de las piezas arrastrada y objetivo
             let draggedIndex = draggedPiece.dataset.index;
             let targetIndex = event.target.dataset.index;
             
-            // Realizamos el intercambio en el DOM
             let temp = document.createElement("div");
             let parent = draggedPiece.parentNode;
             parent.replaceChild(temp, draggedPiece);
             parent.replaceChild(draggedPiece, event.target);
             parent.replaceChild(event.target, temp);
 
-            // Intercambiamos los índices en el array de piezas
             [piezas[draggedIndex], piezas[targetIndex]] = [piezas[targetIndex], piezas[draggedIndex]];
 
+            mostrarMensaje();
             verificarOrden();
         }
 
         function dragEnd(event) {
-            draggedPiece = null; // Limpiamos la referencia a la pieza arrastrada
+            draggedPiece = null;
         }
         
+        function mostrarMensaje() {
+            if (mensajeIndex < mensajesRomanticos.length) {
+                document.getElementById("mensaje").innerText = mensajesRomanticos[mensajeIndex];
+                mensajeIndex++;
+            }
+        }
+
         function verificarOrden() {
             let puzzle = document.getElementById("puzzle").children;
             let correcto = true;
@@ -202,19 +200,23 @@
             if (correcto) {
                 document.getElementById("mensaje").innerHTML = "¡Felicidades! Has completado el rompecabezas. 💕" +
                 "<br><span class='ganaste'>¡TE AMOOOOOOOO! 💖</span>";
-                document.getElementById("botonRomantico").style.display = "block"; // Mostrar el botón romántico
-            } else {
-                let mensajeAleatorio = mensajesRomanticos[Math.floor(Math.random() * mensajesRomanticos.length)];
-                document.getElementById("mensaje").innerText = mensajeAleatorio;
+                document.getElementById("botonRomantico").style.display = "block"; 
             }
         }
         
         function mostrarCarta() {
-            document.getElementById("carta").style.display = "block"; // Mostrar la carta
-            document.getElementById("musica").style.display = "block"; // Mostrar la música
-            document.getElementById("musica").play(); // Reproducir la música
+            document.getElementById("carta").style.display = "block"; 
+            document.getElementById("musica").style.display = "block"; 
+            document.getElementById("musica").play(); 
+
+            let lineas = document.querySelectorAll(".linea");
+            lineas.forEach((linea, index) => {
+                setTimeout(() => {
+                    linea.classList.add("mostrar");
+                }, index * 1500); 
+            });
         }
-        
+
         crearRompecabezas();
     </script>
 </body>
